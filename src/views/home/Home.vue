@@ -5,59 +5,15 @@
     <home-swiper :banners="banners" />
     <recommend-view :recommends="recommends" />
     <feature-view />
-    <tab-control class="tab-control" :titles="['流行','新款','精选']"/>
+    <tab-control
+      class="tab-control"
+      :titles="['流行', '新款', '精选']"
+      @tabClick="tabClick"
+    />
+    <!-- <goods-list :goods="goods[currentType].list" /> -->
+    <goods-list :goods="showGoods" />
+
     <ul>
-      <li>hahah1</li>
-      <li>hahah2</li>
-      <li>hahah3</li>
-      <li>hahah4</li>
-      <li>hahah5</li>
-      <li>hahah6</li>
-      <li>hahah7</li>
-      <li>hahah8</li>
-      <li>hahah9</li>
-      <li>hahah10</li>
-      <li>hahah11</li>
-      <li>hahah12</li>
-      <li>hahah13</li>
-      <li>hahah14</li>
-      <li>hahah15</li>
-      <li>hahah16</li>
-      <li>hahah17</li>
-      <li>hahah18</li>
-      <li>hahah19</li>
-      <li>hahah20</li>
-      <li>hahah21</li>
-      <li>hahah22</li>
-      <li>hahah23</li>
-      <li>hahah24</li>
-      <li>hahah25</li>
-      <li>hahah26</li>
-       <li>hahah1</li>
-      <li>hahah2</li>
-      <li>hahah3</li>
-      <li>hahah4</li>
-      <li>hahah5</li>
-      <li>hahah6</li>
-      <li>hahah7</li>
-      <li>hahah8</li>
-      <li>hahah9</li>
-      <li>hahah10</li>
-      <li>hahah11</li>
-      <li>hahah12</li>
-      <li>hahah13</li>
-      <li>hahah14</li>
-      <li>hahah15</li>
-      <li>hahah16</li>
-      <li>hahah17</li>
-      <li>hahah18</li>
-      <li>hahah19</li>
-      <li>hahah20</li>
-      <li>hahah21</li>
-      <li>hahah22</li>
-      <li>hahah23</li>
-      <li>hahah24</li>
-      <li>hahah25</li>
       <li>hahah26</li>
     </ul>
   </div>
@@ -70,8 +26,9 @@ import FeatureView from "./childComps/FeatureView";
 
 import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
+import GoodsList from "components/content/goods/GoodsList";
 
-import { getHomeMultidata } from "network/home";
+import { getHomeMultidata, getHomeGoods } from "network/home";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 
@@ -82,30 +39,78 @@ export default {
     RecommendView,
     FeatureView,
     NavBar,
-    TabControl
+    TabControl,
+    GoodsList,
   },
   data() {
     //这里存放数据
     return {
       banners: [],
       recommends: [],
-    };
+      goods: {
+        pop: { page: 0, list: [] },
+        new: { page: 0, list: [] },
+        sell: { page: 0, list: [] },
+      },
+      currentType: "pop",
+    }
+  },
+  computed: {
+    showGoods(){
+      return this.goods[this.currentType].list
+    }
   },
   created() {
     //1.请求多个数据
-    getHomeMultidata().then((res) => {
-      // console.log(res);
-      this.banners = res.data.banner.list;
-      this.recommends = res.data.recommend.list;
-    });
+    this.getHomeMultidata();
+
+    //2.请求商品数据
+    this.getHomeGoods("pop");
+    this.getHomeGoods("new");
+    this.getHomeGoods("sell");
   },
 
-  //监听属性 类似于data概念
-  computed: {},
+  methods: {
+    /*事件监听相关方法 */
+    tabClick(index) {
+      // console.log(index);
+      switch (index) {
+        case 0:
+          this.currentType = "pop";
+          break;
+        case 1:
+          this.currentType = "new";
+          break;
+        case 2:
+          this.currentType = "sell";
+          break;
+      }
+    },
+
+    /*
+     网络请求相关方法
+    */
+    getHomeMultidata() {
+      getHomeMultidata().then((res) => {
+        // console.log(res);
+        this.banners = res.data.banner.list;
+        this.recommends = res.data.recommend.list;
+      });
+    },
+    getHomeGoods(type) {
+      const page = this.goods[type].page + 1;
+      getHomeGoods(type, page).then((res) => {
+        // console.log(res);
+        this.goods[type].list.push(...res.data.list);
+        this.goods[type].page += 1;
+      });
+    },
+  },
+
+
   //监控data中的数据变化
   watch: {},
   //方法集合
-  methods: {},
 };
 </script>
 <style scoped>
@@ -123,8 +128,9 @@ export default {
   z-index: 9;
 }
 
-.tab-control{
+.tab-control {
   position: sticky;
   top: 44px;
+  z-index: 9;
 }
 </style>
