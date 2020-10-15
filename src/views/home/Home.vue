@@ -131,6 +131,7 @@ export default {
 
     loadMore() {
       // console.log("上拉加载更多");
+      
       this.getHomeGoods(this.currentType);
 
       this.$refs.scroll.scroll.refresh();
