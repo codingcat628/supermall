@@ -43,10 +43,12 @@ export default {
     });
     // console.log(this.scroll);
     //3.监听上拉事件
-    this.scroll.on("pullingUp", () => {
-      // console.log("上啦加载更多");
-      this.$emit("pullingUp");
-    });
+    if (this.pullUpLoad) {
+      this.scroll.on("pullingUp", () => {
+        // console.log("上啦加载更多");
+        this.$emit("pullingUp");
+      });
+    }
   },
 
   methods: {
@@ -54,11 +56,15 @@ export default {
       this.scroll && this.scroll.scrollTo(x, y, time);
     },
     finishPullUp() {
-      this.scroll.finishPullUp();
+      this.scroll && this.scroll.finishPullUp();
     },
     refresh() {
-      console.log("---------");
+      //刷新可滚动高度
+      // console.log("---------");
       this.scroll && this.scroll.refresh();
+    },
+    getScrollY() {
+      return this.scroll ? this.scroll.y : 0;
     },
   },
 };
