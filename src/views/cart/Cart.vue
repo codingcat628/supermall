@@ -1,24 +1,49 @@
-<!--  -->
 <template>
-<h2>购物车</h2>
+  <div class="cart">
+    <!-- 导航 -->
+    <nav-bar class="nav-bar">
+      <div slot="center">购物车({{ length }})</div>
+    </nav-bar>
+
+    <!-- 商品列表 -->
+  <cart-list></cart-list>
+
+  <!-- 底部组件 -->
+  <cart-bottom-bar></cart-bottom-bar>
+  </div>
 </template>
 
 <script>
-//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
-//例如：import 《组件名称》 from '《组件路径》';
+import NavBar from "components/common/navbar/NavBar";
+import CartList from './childComps/CartList';
+import CartBottomBar from './childComps/CartBottomBar'
+
+import { mapGetters } from "vuex";
 
 export default {
-//import引入的组件需要注入到对象中才能使用
-components: {},
-data() {
-//这里存放数据
-return {
-
+  name: "Cart",
+  components: {
+    NavBar,
+    CartList,
+    CartBottomBar
+  },
+  computed: {
+    //两种语法
+    //mapGetters辅助函数将store中的getter映射到局部计算属性中
+    //  ...mapGetters(['cartLength','cartList'])
+    ...mapGetters({
+      length: "cartLength"
+    }),
+  },
 };
-},
-
-}
 </script>
 <style scoped>
-
+.cart{
+  height: 100vh;
+}
+.nav-bar {
+  background-color: var(--color-tint);
+  color: #fff;
+  /* font-weight: 700; */
+}
 </style>

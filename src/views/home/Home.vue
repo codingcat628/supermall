@@ -46,6 +46,8 @@ import BackTop from "components/content/backTop/BackTop";
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
 import { debounce } from "common/utils";
+import {itemListenerMixin} from "common/mixin";
+
 
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
@@ -63,6 +65,7 @@ export default {
     Scroll,
     BackTop,
   },
+  mixins:[itemListenerMixin],
   data() {
     //这里存放数据
     return {
@@ -95,8 +98,12 @@ export default {
     this.$refs.scroll.refresh();
   },
   deactivated() {
+    //1.保存Y值
     this.saveY=this.$refs.scroll.getScrollY();
     // console.log(this.saveY);
+
+    //2.取消全局事件的监听
+    this.$bus.$off('itemImageLoad',this.itemImageListener)
 
   },
 
@@ -110,11 +117,14 @@ export default {
     this.getHomeGoods("sell");
   },
   mounted() {
-    //1.监听item中图片加载完成
-    const refresh = debounce(this.$refs.scroll.refresh, 50);
-    this.$bus.$on("itemImageLoad", () => {
-      refresh();
-    });
+    // //1.监听item中图片加载完成
+    // const refresh = debounce(this.$refs.scroll.refresh, 50);
+
+    // //对监听的事件进行保存
+    // this.itemImgListener=() => {
+    //   refresh();
+    // }
+    // this.$bus.$on("itemImageLoad", this.itemImgListener);
   },
   methods: {
     /*事件监听相关方法 */
